@@ -30,7 +30,6 @@ app.get('/quiz', (req, res) => {
 	}
 
 	let theme;
-	let expandedTheme;
 
 	let inputData = (type == 'history') ? history : geography;
 
@@ -48,22 +47,15 @@ app.get('/quiz', (req, res) => {
 	
 	theme = selectedChunk[_.random(0, selectedChunk.length - 1)]
 
-	// expand theme by adding continents for geography questions
-	if (type == 'geography' && _.random(0, geography.continents.length)) {
-		expandedTheme = `${theme} in ${geography.continents[_.random(0, geography.continents.length - 1)]}`
-	}
-
-	let topic = expandedTheme ? expandedTheme : theme;
-
 	// prompt text
-	const prompt = `You are a school teacher. Create a 10 question ${type} quiz about ${topic}. For each question give 1 correct answer and 3 possible but wrong answers. Give me the answer in JSON format with no extra characters beside pure JSON format output. Use following structure: [{"question": "***question***", "answers": [{"correct": true, "answer": "***answer***"}, {"correct": false, "answer": "***answer***"}, {"correct": false, "answer": "***answer***"}, {"correct": false, "answer": "***answer***"}]]`
+	const prompt = `You are a school teacher. Create a 10 question ${type} quiz about ${theme}. For each question give 1 correct answer and 3 possible but wrong answers. Give me the answer in JSON format with no extra characters beside pure JSON format output. Use following structure: [{"question": "***question***", "answers": [{"correct": true, "answer": "***answer***"}, {"correct": false, "answer": "***answer***"}, {"correct": false, "answer": "***answer***"}, {"correct": false, "answer": "***answer***"}]]`
 
 	// prompt validation before sending API request
-	if (!(prompt && type && topic && theme)) {
+	if (!(prompt && type && theme)) {
 		return res.status(400).json({status: 400, message: "Invalid request"})
 	}
 
-	function sendPrompt(prompt, topic, type, theme) {
+	function sendPrompt(prompt, type, theme) {
 		console.log("sendPrompt!!!")
 
 		// send prompt to openAI
@@ -74,7 +66,7 @@ app.get('/quiz', (req, res) => {
 				'Authorization': `Bearer ${process.env.OPENAI_KEY}`
 			},
 			body: JSON.stringify({
-				"model": "gpt-3.5-turbo",
+				"model": "gpt-4.1-2025-04-14",
 				"temperature": 0,
 				"input": prompt
 			})
@@ -108,14 +100,15 @@ app.get('/quiz', (req, res) => {
 					'Authorization': `Bearer ${process.env.OPENAI_KEY}`
 				},
 				body: JSON.stringify({
-					"model": "gpt-3.5-turbo",
+					"model": "gpt-4.1-2025-04-14",
 					"temperature": 0,
-					"input": `On the theme of ${topic}. ${question.question}. I have 4 possible answers: ${allAnswers}. Give me the answer in a few sentences.`
+					"input": `On the theme of: '${theme}'. Question is: '${question.question}'. I have 4 possible answers of which one is true and the other three are false. Possible answers are: '${allAnswers}'. Give me the long answer to a question in a few sentences up to one paragraph length. After giving the long answer, review and edit possible answers for correctness. Give me the response in JSON format with no extra characters beside pure JSON format output. Use following structure: [{"question": "***question***", "longAnswer": "***longAnswer***", "possibleAnswers": [{"correct": true, "answer": "***answer***"}, {"correct": false, "answer": "***answer***"}, {"correct": false, "answer": "***answer***"}, {"correct": false, "answer": "***answer***"}]]`
 				})
 			}).then((response) => {
 				return response.json()
 			}).then((data) => {
-				let solution = data.output[0].content[0].text;
+				let output = JSON.parse(data.output[0].content[0].text)[0];
+				console.log("output", output);
 
 				// return data
 				res.json({
@@ -124,25 +117,25 @@ app.get('/quiz', (req, res) => {
 							subject: type,
 							theme: theme,
 							question: question.question,
-							answers: _.shuffle(question.answers),
-							solution: solution,
+							answers: _.shuffle(output.possibleAnswers),
+							solution: output.longAnswer,
 						},
         			],
 				});
 			}).catch((error) => {
 				console.log("error!!! resending request!!!", error);
-				sendPrompt(prompt, topic, type, theme)
+				sendPrompt(prompt, type, theme)
 			})
 		}).catch((error) => {
 			// error usually occurs because of malformed JSON in API response. resend request.
 			console.log("error!!! resending request!!!", error);
-			sendPrompt(prompt, topic, type, theme)
+			sendPrompt(prompt, type, theme)
 		})
 	
 	}
 
 // send prompt to openAI API
-sendPrompt(prompt, topic, type, theme)
+sendPrompt(prompt, type, theme)
 
 });
 
