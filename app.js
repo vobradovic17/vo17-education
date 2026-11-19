@@ -2,6 +2,9 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'public')));
+
 const cors = require('cors');
 app.use(cors());
 
@@ -137,6 +140,50 @@ app.get('/quiz', (req, res) => {
 // send prompt to openAI API
 sendPrompt(prompt, type, theme)
 
+});
+
+// contact form: appends each message as one JSON line to messages.jsonl
+const fs = require('fs');
+const MESSAGES_FILE = path.join(__dirname, 'messages.jsonl');
+const contactHits = new Map(); // ip -> [timestamps]
+const CONTACT_LIMIT = 5;
+const CONTACT_WINDOW_MS = 60 * 60 * 1000;
+
+app.post('/contact', async (req, res) => {
+	const { name, email, message, website } = req.body || {};
+
+	// honeypot: pretend success for bots
+	if (website) return res.json({ status: 200 });
+
+	if (typeof name !== 'string' || typeof email !== 'string' || typeof message !== 'string' ||
+		!name.trim() || !message.trim() ||
+		name.length > 100 || email.length > 200 || message.length > 5000 ||
+		!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+		return res.status(400).json({ status: 400, message: "Invalid form data" });
+	}
+
+	// simple in-memory rate limit per IP
+	const now = Date.now();
+	const hits = (contactHits.get(req.ip) || []).filter((t) => now - t < CONTACT_WINDOW_MS);
+	if (hits.length >= CONTACT_LIMIT) {
+		return res.status(429).json({ status: 429, message: "Too many messages. Try again later." });
+	}
+	hits.push(now);
+	contactHits.set(req.ip, hits);
+
+	try {
+		const entry = {
+			receivedAt: new Date().toISOString(),
+			name: name.trim(),
+			email: email.trim(),
+			message: message.trim()
+		};
+		await fs.promises.appendFile(MESSAGES_FILE, JSON.stringify(entry) + '\n');
+		res.json({ status: 200 });
+	} catch (error) {
+		console.log("contact form error", error);
+		res.status(500).json({ status: 500, message: "Could not save message" });
+	}
 });
 
 const port = process.env.PORT || 3000;
