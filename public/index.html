@@ -12,7 +12,8 @@
     <div class="header-top">
       <div class="logo" aria-hidden="true">VO</div>
       <span class="header-name">Vladimir Obradović</span>
-      <nav class="tabs">
+      <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span></button>
+      <nav class="tabs" id="site-nav">
         <a class="tab active" href="/">Home</a>
         <a class="tab" href="/projects.html">Projects</a>
         <a class="tab" href="/contact.html">Contact</a>
@@ -24,12 +25,14 @@
     <main>
       <section class="card">
         <div class="profile-wrap">
-          <div>
+          <div class="info-wrap">
             <div class="avatar-wrap">
               <div class="avatar-fallback" aria-hidden="true">VO</div>
               <img class="avatar" src="/profile.jpg" alt="Vladimir Obradović" onerror="this.remove()">
             </div>
-            <h1 class="fullname">Vladimir Obradović</h1>
+            <div>
+              <h1 class="fullname">Vladimir Obradović</h1>
+            </div>
           </div>
           <div class="description">
             <p>Hi, I'm Vladimir Obradović.</p>
@@ -44,8 +47,8 @@
           </div>
         </div>
       </section>
-
     </main>
   </div>
+  <script src="/nav.js" defer></script>
 </body>
 </html>

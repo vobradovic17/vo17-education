@@ -12,7 +12,8 @@
     <div class="header-top">
       <div class="logo" aria-hidden="true">VO</div>
       <span class="header-name">Vladimir Obradović</span>
-      <nav class="tabs">
+      <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span></button>
+      <nav class="tabs" id="site-nav">
         <a class="tab" href="/">Home</a>
         <a class="tab active" href="/projects.html">Projects</a>
         <a class="tab" href="/contact.html">Contact</a>
@@ -22,10 +23,6 @@
 
   <div class="container">
     <main>
-      <div class="section-head" style="margin-top:0">
-        <h2>Projects</h2>
-      </div>
-
       <div class="repos">
         <article class="repo">
           <img class="repo-img" src="/world-cup-history.png" alt="World Cup History screenshot">
@@ -66,5 +63,6 @@
       </div>
     </main>
   </div>
+  <script src="/nav.js" defer></script>
 </body>
 </html>
