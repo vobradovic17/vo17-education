@@ -52,6 +52,8 @@ a:hover { text-decoration: underline; }
   font-weight: 600; font-size: 13px;
 }
 .header-name { font-weight: 600; color: var(--text); }
+.brand { display: flex; align-items: center; gap: 16px; color: var(--text); }
+.brand:hover { text-decoration: none; }
 
 .tabs { display: flex; gap: 8px; margin-left: auto; min-width: 0; overflow-x: auto; }
 .tab {
@@ -63,6 +65,21 @@ a:hover { text-decoration: underline; }
 }
 .tab:hover { text-decoration: none; border-bottom-color: var(--border); }
 .tab.active { font-weight: 600; border-bottom-color: var(--accent); }
+
+/* projects drop-down */
+.dropdown { position: relative; display: flex; align-items: center; }
+.dropdown-menu {
+  display: none; position: absolute; top: 100%; left: 0; z-index: 30;
+  min-width: 200px; padding: 4px 0;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(31, 35, 40, 0.15);
+}
+.dropdown-menu a { display: block; padding: 8px 16px; color: var(--text); white-space: nowrap; }
+.dropdown-menu a:hover { background: var(--bg-subtle); text-decoration: none; }
+.dropdown:hover .dropdown-menu,
+.dropdown:focus-within .dropdown-menu,
+.dropdown.open .dropdown-menu { display: block; }
+@media (min-width: 576px) { .tabs { overflow: visible; } }
 .counter {
   background: rgba(129, 139, 152, 0.2);
   border-radius: 2em;
@@ -268,6 +285,13 @@ a:hover { text-decoration: underline; }
   .header.open .tabs { display: flex; justify-content: flex-start;}
   .tab { font-size: 20px; padding: 16px 24px; border-bottom: 2px solid transparent; }
   .tab.active { border-bottom-color: var(--accent); }
+  .dropdown { flex-direction: column; }
+  .dropdown-menu {
+    display: block; position: static; min-width: 0; padding: 0 0 8px;
+    background: none; border: 0; box-shadow: none; text-align: center;
+  }
+  .dropdown-menu a { font-size: 16px; padding: 8px 24px; color: var(--muted); }
+  .dropdown-menu a:hover { background: none; }
   html.menu-open { overflow: hidden; }
 
   .contact-form { grid-template-columns: 1fr; gap: 0}

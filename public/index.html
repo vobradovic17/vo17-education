@@ -10,12 +10,21 @@
 <body>
   <header class="header">
     <div class="header-top">
-      <div class="logo" aria-hidden="true">VO</div>
-      <span class="header-name">Vladimir Obradović</span>
+      <a class="brand" href="/" aria-label="Vladimir Obradović – Home">
+        <div class="logo" aria-hidden="true">VO</div>
+        <span class="header-name">Vladimir Obradović</span>
+      </a>
       <button class="nav-toggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="site-nav"><span></span><span></span><span></span></button>
       <nav class="tabs" id="site-nav">
         <a class="tab active" href="/">Home</a>
-        <a class="tab" href="/projects.html">Projects</a>
+        <div class="dropdown">
+          <a class="tab" href="/projects.html">Projects</a>
+          <div class="dropdown-menu">
+            <a href="https://world-cup-history.org">World Cup History</a>
+            <a href="/projects/ludo-knowledge-game.html">Ludo Knowledge Game</a>
+            <a href="/projects/multiple-choice-quiz.html">Multiple Choice Quiz</a>
+          </div>
+        </div>
         <a class="tab" href="/contact.html">Contact</a>
       </nav>
     </div>
